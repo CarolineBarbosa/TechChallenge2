@@ -1,0 +1,4 @@
+playwright
+pyarrow
+
+html5lib
