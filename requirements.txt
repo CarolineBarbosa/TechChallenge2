@@ -2,3 +2,4 @@ playwright
 pyarrow
 
 html5lib
+boto3==1.37.10

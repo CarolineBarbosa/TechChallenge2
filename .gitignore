@@ -8,7 +8,8 @@ __pycache__/
 # excel extensions
 *.csv
 *.xlsx
-
+*.parquet
+.aws/*
 
 # Distribution / packaging
 .Python

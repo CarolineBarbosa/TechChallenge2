@@ -2,34 +2,35 @@ from playwright.sync_api import sync_playwright
 import pandas as pd
 from datetime import datetime
 import os
-import boto3
+# import boto3
 
 def main(date_input):
     data = get_b3_data(date_input)
     if data is not None:
-        save_data_to_s3(data)
+        save_data_to_s3(data, date_input)
 
 
 
-def save_data_to_s3(data):
-    #change here to include s3 bucket
-    data.to_parquet(f'b3_pregao_{date_input}.parquet', index=False)
+def save_data_to_s3(data, date_input):
+    file_name = f'data/b3_pregao_{date_input}.parquet'
+    data.to_parquet(file_name, index=False)
+    # mudar aqui para adicionar os dados no S3
+    # BUCKET = 'amzn-s3-demo-bucket'
+    # s3 = boto3.client('s3')
+    # with open(file_name, 'rb') as data:
+        # s3.Bucket( BUCKET ).put_object(Key='{date_input}.parquet', Body=data)
+
 
 def get_b3_data(date):
 
     formatted_date = format_date(date)
-
+    # url = 
     url = f"https://sistemaswebb3-listados.b3.com.br/indexPage/day/IBOV?language=pt-br&date={formatted_date}"
     
     with sync_playwright() as p:
         browser = launch_browser(p)
         page = browser.new_page()
         page.goto(url)
-
-        # with open('page.html', 'w', encoding='utf-8') as f:
-        #     f.write(page.content())
-        #     print(f"Page content saved to 'page.html' for error handling.")        
-        
         data = scrappe_data(page, date)
         browser.close()
         return data
@@ -51,11 +52,6 @@ def launch_browser(p):
     raise RuntimeError("All browser types failed to launch.")
 
 def scrappe_data(page, date):
-
-#     page.wait_for_selector('table')
-#     table_html = page.inner_html('table')
-#     table_io = StringIO(table_html)
-#     return pd.read_html(table_io, decimal=',', thousands='.')[0]
 
     try:
         page.wait_for_load_state('networkidle')    
@@ -85,11 +81,8 @@ def download_daily_file(page, date):
 def read_downloaded_file(download_path):
     if download_path is not None:
         df = pd.read_csv(download_path, encoding='iso-8859-1', sep=';', decimal=',', header=1, usecols=[0, 1, 2, 3, 4])
+        df.columns = ['Codigo', 'Acao', 'Tipo', 'Qtde_Teorica', 'Part_Percentual']
         return df[:-2] 
     else:
         raise Exception("Failed to download the file.")
 
-
-if __name__ == "__main__":
-    date_input = input("Selecione a data do pregão (YYYY-MM-DD): ")
-    main(date_input)
