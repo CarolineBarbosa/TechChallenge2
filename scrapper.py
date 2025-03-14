@@ -2,6 +2,7 @@ from playwright.sync_api import sync_playwright
 import pandas as pd
 from datetime import datetime
 import os
+import re
 # import boto3
 
 def main(date_input):
@@ -79,9 +80,14 @@ def download_daily_file(page, date):
 
     
 def read_downloaded_file(download_path):
+    match = re.search(r"\d{4}-\d{2}-\d{2}", download_path)
+    if match:
+        date = match.group()
+
     if download_path is not None:
         df = pd.read_csv(download_path, encoding='iso-8859-1', sep=';', decimal=',', header=1, usecols=[0, 1, 2, 3, 4])
-        df.columns = ['Codigo', 'Acao', 'Tipo', 'Qtde_Teorica', 'Part_Percentual']
+        df['Data'] = str(date)
+        df.columns = ['Codigo', 'Acao', 'Tipo', 'Qtde_Teorica', 'Part_Percentual', 'Data']
         return df[:-2] 
     else:
         raise Exception("Failed to download the file.")
