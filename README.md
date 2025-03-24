@@ -47,3 +47,6 @@ Baixe os dados de origem no seguinte link:
 - **Lambda**: Serviço de computação serverless para executar código ETL glue.
 - **Athena**: Serviço de consulta para analisar dados.
 
+##  Arquitetura
+
+![Untitled](https://github.com/user-attachments/assets/64f30b81-138a-4bac-93b1-a7d9e1466163)
